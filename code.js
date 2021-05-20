@@ -20,7 +20,7 @@ window.onload = function(){
         var file = new Blob([desc], {type: "text/plaintext"})
 
         const a = document.createElement('a')
-        a.href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(desc) +"?phone=554598611989"
+        a.href = "https://api.whatsapp.com/send?phone=554598611989&text=" + encodeURIComponent(desc) +""
         a.click()
         a.remove()
     })
