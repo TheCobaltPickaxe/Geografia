@@ -21,7 +21,9 @@ var picker = undefined;
 function onApiLoad(){
     console.log("Google API loaded")
     gapi.load("auth2", function(){
-
+        gapi.signin2.render("googleSignIn", {
+            scope: 'email profile https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/drive.readonly'
+        })
     })
     gapi.load("picker", function(){
         console.log("Picker API loaded")
@@ -44,7 +46,7 @@ function onSignIn(googleUser){
     document.getElementById("logoutBtn").removeAttribute("hidden")
 
     //Create Picker
-    var view = new google.picker.DocsView(google.picker.ViewId.DOCS_IMAGES)
+    var view = new google.picker.DocsView(google.picker.ViewId.DOCS)
     view.setParent("1XT8sc_8BrFO4XsOTyrHoikj3a4CRIuGj")
     picker = new google.picker.PickerBuilder()
         .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
