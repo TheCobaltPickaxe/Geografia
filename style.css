@@ -196,6 +196,10 @@
     outline: 1px dotted;
     outline: 5px auto -webkit-focus-ring-color; }
   
+  option{
+    background-color: #5b279d;
+  }
+
   input,
   button,
   select,
@@ -8216,7 +8220,6 @@
   .contact-wrap {
     background: #7f279c;
     background: -moz-linear-gradient(-45deg, #7f279c 0%, #2e279d 100%);
-    background: -webkit-gradient(left top, right bottom, color-stop(0%, #7f279c), color-stop(100%, #2e279d));
     background: -webkit-linear-gradient(-45deg, #7f279c 0%, #2e279d 100%);
     background: -o-linear-gradient(-45deg, #7f279c 0%, #2e279d 100%);
     background: -ms-linear-gradient(-45deg, #7f279c 0%, #2e279d 100%);
@@ -8300,7 +8303,7 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding: 0; }
   
-  #contactForm .error {
+  .error {
     color: #f65c78;
     font-size: 12px; }
   
