@@ -85,7 +85,6 @@ function writeEntry(rockName, rockType, desc, userEmail, imageID){
 function pickImage(imgData){
     if (imgData.action == "picked"){
         
-        notLaSalle.toggleAttribute("hidden", true)
         logIn.toggleAttribute("hidden", true)
     
         const data = Object.fromEntries(new FormData(form).entries())
