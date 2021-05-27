@@ -22,6 +22,7 @@ function onApiLoad(){
     console.log("Google API loaded")
     gapi.load("auth2", function(){
         gapi.signin2.render("googleSignIn", {
+            onsuccess: onSignIn,
             scope: 'email profile https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/drive.readonly'
         })
     })
@@ -34,16 +35,17 @@ function onSignIn(googleUser){
     //Get Info
     user = googleUser
     profile = googleUser.getBasicProfile()
-    loginBtn = document.getElementsByClassName("g-signin2")[0]
     accessToken = googleUser.getAuthResponse(true).access_token;
 
     //Create Logout
-    var newElement = document.createElement("img")
-    newElement.setAttribute("src", profile.getImageUrl())
-    newElement.setAttribute("style", "border-radius:50%; width:60px; height:60px;")
-    newElement.setAttribute("id", "loggedImage")
-    loginBtn.parentNode.replaceChild(newElement, loginBtn)
-    document.getElementById("logoutBtn").removeAttribute("hidden")
+    if (loginBtn){
+        var newElement = document.createElement("img")
+        newElement.setAttribute("src", profile.getImageUrl())
+        newElement.setAttribute("style", "border-radius:50%; width:60px; height:60px;")
+        newElement.setAttribute("id", "loggedImage")
+        loginBtn.parentNode.replaceChild(newElement, loginBtn)
+        document.getElementById("logoutBtn").removeAttribute("hidden")
+    }
 
     //Create Picker
     var view = new google.picker.DocsView(google.picker.ViewId.DOCS)
@@ -82,21 +84,7 @@ function writeEntry(rockName, rockType, desc, userEmail, imageID){
 
 function pickImage(imgData){
     if (imgData.action == "picked"){
-        const notLaSalle = document.getElementById("notLaSalleError")
-        const logIn = document.getElementById("logInError")
-        if (!profile){
-            notLaSalle.toggleAttribute("hidden", true)
-            logIn.removeAttribute("hidden")
-            return
-        }
-    
-        const email = profile.getEmail()
-        if (email.split("@")[1] != "soulasalle.com.br"){
-            notLaSalle.removeAttribute("hidden")
-            logIn.toggleAttribute("hidden", true)
-            return
-        }
-    
+        
         notLaSalle.toggleAttribute("hidden", true)
         logIn.toggleAttribute("hidden", true)
     
@@ -112,9 +100,24 @@ function pickImage(imgData){
 }
 
 window.onload = function(){
+    loginBtn = document.getElementsByClassName("g-signin2")[0]
     var form = document.getElementById("form")
     form.addEventListener("submit", (e) => {
         e.preventDefault()
+        const notLaSalle = document.getElementById("notLaSalleError")
+        const logIn = document.getElementById("logInError")
+        if (!profile){
+            notLaSalle.toggleAttribute("hidden", true)
+            logIn.removeAttribute("hidden")
+            return
+        }
+    
+        const email = profile.getEmail()
+        if (email.split("@")[1] != "soulasalle.com.br"){
+            notLaSalle.removeAttribute("hidden")
+            logIn.toggleAttribute("hidden", true)
+            return
+        }
         picker.setVisible(true)
     }, false)
 }
