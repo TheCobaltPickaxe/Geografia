@@ -85,14 +85,14 @@ function writeEntry(rockName, rockType, desc, userEmail, imageID){
 function pickImage(imgData){
     if (imgData.action == "picked"){
         
-        logIn.toggleAttribute("hidden", true)
+        loginBtn.toggleAttribute("hidden", true)
     
         const data = Object.fromEntries(new FormData(form).entries())
         images = []
         imgData.docs.forEach(element => {
             images.push(element.id)
         });
-        writeEntry(data.rock, data.type, data.message, email, images).then(function(){
+        writeEntry(data.rock, data.type, data.message, profile.getEmail(), images).then(function(){
             window.location.reload()
         })
     }
