@@ -41,7 +41,7 @@ function onSignIn(googleUser){
     if (loginBtn && loginBtn.parentNode){
         var newElement = document.createElement("img")
         newElement.setAttribute("src", profile.getImageUrl())
-        newElement.setAttribute("style", "border-radius:50%; width:60px; height:60px;")
+        newElement.setAttribute("style", "border-radius:50%; width:60px; height:60px; margin-left: 15px;")
         newElement.setAttribute("id", "loggedImage")
         loginBtn.parentNode.replaceChild(newElement, loginBtn)
         document.getElementById("logoutBtn").removeAttribute("hidden")
