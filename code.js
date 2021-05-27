@@ -92,7 +92,7 @@ function pickImage(imgData){
         imgData.docs.forEach(element => {
             images.push(element.id)
         });
-        writeEntry(data.rock, data.type, data.message, profile.getEmail(), images).then(function(){
+        writeEntry(data.rock.toLowerCase(), data.type, data.message, profile.getEmail(), images).then(function(){
             window.location.reload()
         })
     }
