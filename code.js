@@ -103,17 +103,14 @@ window.onload = function(){
     var form = document.getElementById("form")
     form.addEventListener("submit", (e) => {
         e.preventDefault()
-        const notLaSalle = document.getElementById("notLaSalleError")
         const logIn = document.getElementById("logInError")
         if (!profile){
-            notLaSalle.toggleAttribute("hidden", true)
             logIn.removeAttribute("hidden")
             return
         }
     
         const email = profile.getEmail()
         if (email.split("@")[1] != "soulasalle.com.br"){
-            notLaSalle.removeAttribute("hidden")
             logIn.toggleAttribute("hidden", true)
             return
         }
