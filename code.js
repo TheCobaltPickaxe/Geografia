@@ -15,7 +15,6 @@ firebase.analytics();
 var user = undefined;
 var profile = undefined;
 var loginBtn = undefined;
-var accessToken = undefined;
 var picker = undefined;
 
 function onApiLoad(){
@@ -39,7 +38,6 @@ function onSignIn(googleUser){
     //Get Info
     user = googleUser
     profile = googleUser.getBasicProfile()
-    accessToken = googleUser.getAuthResponse(true).access_token;
 
     //Create Logout
     if (loginBtn && loginBtn.parentNode){
@@ -58,7 +56,7 @@ function onSignIn(googleUser){
         .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
         .enableFeature(google.picker.Feature.NAV_HIDDEN)
         .setAppId(651642976112)
-        .setOAuthToken(accessToken)
+        .setOAuthToken(googleUser.getAuthResponse(true).access_token)
         .addView(view)
         .setDeveloperKey("AIzaSyBk3-7opruOiHaYmcozSngRFhLF-SuxXJ0")
         .setCallback(pickImage)
@@ -118,6 +116,18 @@ window.onload = function(){
             logIn.toggleAttribute("hidden", true)
             return
         }
-        picker.setVisible(true)
+        if (!user.getGrantedScopes().includes("https://www.googleapis.com/auth/drive.readonly")){
+            const option = new gapi.auth2.SigninOptionsBuilder();
+            option.setScope('https://www.googleapis.com/auth/drive.readonly');
+
+            user.grant(option).then(function(success){
+                picker.setVisible(true)
+            }, function(fail){
+
+            })
+        }
+        else{
+            picker.setVisible(true)
+        }
     }, false)
 }
