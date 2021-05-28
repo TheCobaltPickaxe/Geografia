@@ -59,8 +59,7 @@ function onSignIn(googleUser){
         .setOAuthToken(googleUser.getAuthResponse(true).access_token)
         .addView(view)
         .setDeveloperKey("AIzaSyBk3-7opruOiHaYmcozSngRFhLF-SuxXJ0")
-        .setCallback(pickImage)
-        .build();
+        .setCallback(pickImage);
 }
 
 function onSignOut(){
@@ -121,12 +120,16 @@ window.onload = function(){
             option.setScope('https://www.googleapis.com/auth/drive.readonly');
 
             user.grant(option).then(function(success){
+                picker.setOAuthToken(user.getAuthResponse(true).access_token)
+                picker = picker.build()
                 picker.setVisible(true)
             }, function(fail){
 
             })
         }
         else{
+            if (picker.build)
+                picker = picker.build()
             picker.setVisible(true)
         }
     }, false)
