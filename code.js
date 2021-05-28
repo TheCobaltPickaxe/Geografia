@@ -20,8 +20,7 @@ var picker = undefined;
 
 function onApiLoad(){
     console.log("Google API loaded")
-    gapi.load("auth2", function(){
-        while (!gapi.signin2){}
+    gapi.load("signin2", function(){
         gapi.signin2.render("googleSignIn", {
             onsuccess: onSignIn,
             scope: 'email profile https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/drive.readonly'
