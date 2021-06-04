@@ -16,6 +16,7 @@ var user = undefined;
 var profile = undefined;
 var loginBtn = undefined;
 var picker = undefined;
+var selectedImageIds = []
 
 function onApiLoad(){
     console.log("Google API loaded")
@@ -26,7 +27,7 @@ function onApiLoad(){
         console.log("Loaded signin2")
         gapi.signin2.render("googleSignIn", {
             onsuccess: onSignIn,
-            scope: 'email profile https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/drive.readonly'
+            scope: 'email profile https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/drive'
         })
     })
     gapi.load("picker", function(){
@@ -56,10 +57,12 @@ function onSignIn(googleUser){
         .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
         .enableFeature(google.picker.Feature.NAV_HIDDEN)
         .setAppId(651642976112)
-        .setOAuthToken(googleUser.getAuthResponse(true).access_token)
+        .setOAuthToken(user.getAuthResponse(true).access_token)
         .addView(view)
         .setDeveloperKey("AIzaSyBk3-7opruOiHaYmcozSngRFhLF-SuxXJ0")
-        .setCallback(pickImage);
+        .setCallback(pickImageDrive);
+
+    document.getElementById("logInError").toggleAttribute("hidden", true)
 }
 
 function onSignOut(){
@@ -83,54 +86,149 @@ function writeEntry(rockName, rockType, desc, userEmail, imageID){
     })
 }
 
-function pickImage(imgData){
+function notLoggedInError(){
+    const logIn = document.getElementById("logInError")
+    logIn.removeAttribute("hidden")
+}
+
+function pickImageDrive(imgData){
     if (imgData.action == "picked"){
-        
         loginBtn.toggleAttribute("hidden", true)
-    
-        const data = Object.fromEntries(new FormData(form).entries())
-        images = []
         imgData.docs.forEach(element => {
-            images.push(element.id)
+            selectedImageIds.push(element.id)
+            var imgEl = document.createElement("img")
+            imgEl.setAttribute("src", "https://drive.google.com/thumbnail?id=" + element.id)
+            imgEl.setAttribute("class", "selected-image")
+            imgEl.addEventListener("click", function(e){
+                imgEl.classList.add("removed-image")
+                for (let i = 0; i < selectedImageIds.length; i++) {
+                    const id = selectedImageIds[i];
+                    if (id == element.id){
+                        selectedImageIds.splice(i)
+                    }
+                }
+            })
+            imgEl.addEventListener("transitionend", function(e){
+                if (e.propertyName == "max-width"){
+                    imgEl.remove()
+                }
+            })
+            $(".image-box").append(imgEl)
         });
-        writeEntry(data.rock.toLowerCase(), data.type, data.message, profile.getEmail(), images).then(function(){
-            window.location.reload()
-        })
     }
 }
 
-window.onload = function(){
-    loginBtn = document.getElementsByClassName("g-signin2")[0]
-    var form = document.getElementById("form")
-    form.addEventListener("submit", (e) => {
-        e.preventDefault()
-        const logIn = document.getElementById("logInError")
-        if (!profile){
-            logIn.removeAttribute("hidden")
-            return
-        }
+function pickImagePC(files){
+    for (let i = 0; i < files.length; i++) {
+        const image = files[i];
+        $.ajax({
+            url: "https://content.googleapis.com/drive/v3/files?q=name%3D'" + image.name.split('.').slice(0, -1).join('.')  + "' and '1XT8sc_8BrFO4XsOTyrHoikj3a4CRIuGj' in parents and not trashed&key=AIzaSyBk3-7opruOiHaYmcozSngRFhLF-SuxXJ0",
+            type: "GET",
+            headers:{
+                "Authorization": "Bearer " + user.getAuthResponse(true).access_token
+            },
+            success: function(result){
+                if (result.files.length > 0){
+                    pickImageDrive({action: "picked", docs: [result.files[0]]})
+                }
+                else{
+                    $.ajax({
+                        url:"https://www.googleapis.com/upload/drive/v3/files?uploadType=media&key=AIzaSyBk3-7opruOiHaYmcozSngRFhLF-SuxXJ0",
+                        headers: {
+                            "Authorization": "Bearer " + user.getAuthResponse(true).access_token,
+                            "Content-Type": image.type,
+                            "Content-Length": image.size
+                        },
+                        type: "POST",
+                        processData: false,
+                        data: image,
+                        success: function(result){
+                            var id = result.id
+                            $.ajax({
+                                url: "https://content.googleapis.com/drive/v3/files/" + id + "?addParents=1XT8sc_8BrFO4XsOTyrHoikj3a4CRIuGj",
+                                data: JSON.stringify({
+                                    name: image.name.split('.').slice(0, -1).join('.'),
+                                    description: "Gerado automaticamente pelo site!"
+                                }),
+                                type: "PATCH",
+                                headers:{
+                                    "Authorization": "Bearer " + user.getAuthResponse(true).access_token,
+                                    "Content-Type": "application/json"
+                                },
+                                success: function(result){
+                                    pickImageDrive({action: "picked", docs: [result]})
+                                    console.log(result)
+                                }
+                            })
+                        }
+                    })
+                }
+            }
+        })
+    }
     
-        const email = profile.getEmail()
-        if (email.split("@")[1] != "soulasalle.com.br"){
-            logIn.toggleAttribute("hidden", true)
-            return
-        }
-        if (!user.getGrantedScopes().includes("https://www.googleapis.com/auth/drive.readonly")){
-            const option = new gapi.auth2.SigninOptionsBuilder();
-            option.setScope('https://www.googleapis.com/auth/drive.readonly');
+}
 
-            user.grant(option).then(function(success){
+function selectImage(isDrive){
+	function loginChecked() {
+        if (isDrive){
+            if (picker.build){
                 picker.setOAuthToken(user.getAuthResponse(true).access_token)
                 picker = picker.build()
-                picker.setVisible(true)
-            }, function(fail){
-
-            })
-        }
-        else{
-            if (picker.build)
-                picker = picker.build()
+            }
             picker.setVisible(true)
         }
-    }, false)
+        else{
+            document.getElementById("fileInput").click()
+        }
+    }
+
+    if (!user){
+        notLoggedInError()
+        return
+    }
+
+	//Request Drive Perm
+	if (!user.getGrantedScopes().includes("https://www.googleapis.com/auth/drive")){
+        canProceed = false
+		const option = new gapi.auth2.SigninOptionsBuilder();
+		option.setScope('https://www.googleapis.com/auth/drive');
+
+		user.grant(option).then(function(success){
+            loginChecked()
+		}, function(fail){
+
+		})
+	}
+
+    else{
+        loginChecked()
+    }
+    
 }
+
+window.onload = function(){
+    loginBtn = $(".g-signin2")[0]
+    $("#form").submit((e) =>{
+        e.preventDefault()
+		try{
+			if (!profile){
+                notLoggedInError()
+                return
+			}
+
+			const data = Object.fromEntries(new FormData($("form")[0]).entries())
+
+			writeEntry(data.rock.toLowerCase(), data.type, data.message, profile.getEmail(), selectedImageIds).then(function(){
+				window.location.reload()
+			})
+		} catch(e){
+			genError = document.getElementById("genericError")
+            genError.textContent = e
+            genError.toggleAttribute("hidden", false)
+            
+		}
+    })
+}
+
+//TODO: REMOVE IMG THINGY

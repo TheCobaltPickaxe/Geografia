@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,700" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mystyle.css">
     <meta name="google-signin-client_id" content="651642976112-k6mm3uhp2cn1obldt3eq18r2qhc7uuje.apps.googleusercontent.com">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 
@@ -50,14 +52,27 @@
                                     </div>
                                 </div> -->
                                 <div class="col-md-12">
-                                    <div style="float: right; display:flexbox; justify-content: center; align-items: center;">
-                                        <div class="g-signin2" id="googleSignIn" data-onsuccess="onSignIn"></div>
-                                        <button id="logoutBtn" onclick="onSignOut()" class="btn btn-secondary" type="button" style="display: block; margin-top: 10px;" hidden>Deslogar</button>
+								    <div class="form-group" style="display:flex; flex-wrap: wrap; justify-content: center;">
+                                        <div>
+                                            <input type="button" value="Imagem do Computador" onClick="selectImage(false)" class="btn btn-secondary">
+                                            <input type="button" value="Imagem Do Drive" onClick="selectImage(true)" class="btn btn-secondary" style="margin-left: 10px;">
+                                            <input type="file" accept="image/*, image/heic, image/heif" id="fileInput" multiple oninput="pickImagePC(document.getElementById('fileInput').files)" onclick="this.value = null" hidden>
+                                        </div>
+                                        <div class="image-box">
+                                        </div>
                                     </div>
+                                    
+                                </div>
+                                <div class="col-md-12">
                                     <div class="form-group">
+										<div style="float: right; display:flexbox; justify-content: center; align-items: center;">
+                                        	<div class="g-signin2" id="googleSignIn" data-onsuccess="onSignIn"></div>
+                                        	<button id="logoutBtn" onclick="onSignOut()" class="btn btn-secondary" type="button" style="display: block; margin-top: 10px;" hidden>Deslogar</button>
+                                    	</div>
                                         <input type="submit" value="Enviar" class="btn btn-primary">
-                                        <p class="error" id="logInError" hidden>Entre com sua conta google do La Salle antes de enviar!</p>
+                                        <p class="error" id="logInError" hidden>Entre com sua conta google do La Salle antes de fazer isso!</p>
                                         <p class="error" id="notLaSalleError" hidden>A conta logada não é do La Salle!</p>
+										<p class="error" id="genericError" hidden></p>
                                     </div>
                                 </div>
                             </div>

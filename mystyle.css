@@ -1,0 +1,28 @@
+.image-box{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    background-color: (125, 125, 125, 128);
+    width: 100%;
+    height: auto;
+}
+
+.selected-image{
+    border-radius: 10%;
+    flex-basis: auto;
+    max-width: 100%;
+    max-height: 100%;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.removed-image{
+    max-width: 0%;
+}
+
+.selected-image:hover{
+    transform: scale(1.25);
+    cursor: pointer;
+}
