@@ -63,6 +63,14 @@ function onSignIn(googleUser){
         .setCallback(pickImageDrive);
 
     document.getElementById("logInError").toggleAttribute("hidden", true)
+
+    if (firebase.auth.currentUser == null){
+        var credential = firebase.auth.GoogleAuthProvider.credential(googleUser.getAuthResponse(true).id_token);
+        firebase.auth().signInWithCredential(credential).then((user) =>{
+            console.log(user)
+            firebase.auth.currentUser = user
+        })
+    }
 }
 
 function onSignOut(){
